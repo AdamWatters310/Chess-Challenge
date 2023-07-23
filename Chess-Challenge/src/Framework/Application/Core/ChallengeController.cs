@@ -3,6 +3,7 @@ using ChessChallenge.Example;
 using Raylib_cs;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
@@ -55,6 +56,7 @@ namespace ChessChallenge.Application
 
         public ChallengeController()
         {
+            Log($"Launching Chess-Challenge version {Settings.Version}");
             tokenCount = GetTokenCount();
             Warmer.Warm();
 
@@ -65,7 +67,7 @@ namespace ChessChallenge.Application
 
             BotStatsA = new BotMatchStats("IBot");
             BotStatsB = new BotMatchStats("IBot");
-            botMatchStartFens = FileHelper.ReadResourceFile("Fens.txt").Split('\n');
+            botMatchStartFens = FileHelper.ReadResourceFile("Fens.txt").Split('\n').Where(fen => fen.Length > 0).ToArray();
             botTaskWaitHandle = new AutoResetEvent(false);
 
             StartNewGame(PlayerType.Human, PlayerType.MyBot);
@@ -228,8 +230,7 @@ namespace ChessChallenge.Application
                 {
                     moveToPlay = chosenMove;
                     isWaitingToPlayMove = true;
-                    const float minDelay = 0.1f;
-                    playMoveTime = lastMoveMadeTime + minDelay;
+                    playMoveTime = lastMoveMadeTime + MinMoveDelay;
                 }
                 else
                 {
